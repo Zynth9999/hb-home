@@ -1,0 +1,730 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>hb@home</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet" />
+  <style>
+    body {
+      font-family: 'Roboto', sans-serif;
+      background: #1E1E1E;
+      color: #ffffff;
+      margin: 0;
+      padding: 0;
+      font-size: large;
+    }
+
+    :root {
+      --bg: #1E1E1E;
+      --fg: #ffffff;
+      --hover: #b388ff33;
+      --highlight: #b388ff;
+      --transition-time: 0.7s;
+      --note-color: #4CB3D4;
+    }
+
+    a {
+      color: var(--fg);
+      text-decoration: none;
+      transition: color var(--transition-time);
+    }
+
+    a:hover {
+      color: var(--highlight);
+    }
+
+    .active {
+      color: var(--highlight) !important;
+      font-weight: bold;
+      background: var(--hover) !important;
+    }
+
+    h2, h3 {
+      scroll-margin-top: 120px;
+    }
+
+    .sticky-header {
+      position: sticky;
+      top: 0;
+      background: #1f1f1f;
+      padding: 1rem 1.5rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      z-index: 1000;
+      box-shadow: 0 2px 4px #0008;
+    }
+
+    .layout {
+      display: flex;
+      height: calc(100vh - 64px - 74px); /* Subtract header and bottom nav heights */
+      overflow: hidden; /* Prevent scrolling on the entire layout */
+    }
+    
+    .sidebar {
+      width: 240px;
+      background: #1e1e1e;
+      padding: 1rem;
+      overflow-y: auto;
+      border-right: 1px solid #333;
+      flex-shrink: 0;
+    }
+
+    .sidebar .item {
+      cursor: pointer;
+      padding: 0.6rem 0.8rem;
+      border-radius: 8px;
+      font-size: 1rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      transition: background var(--transition-time);
+    }
+
+    .sidebar .item > a {
+      flex: 1;
+      border-radius: 8px;
+    }
+
+    .sidebar .item:hover {
+      background: var(--hover);
+      
+    }
+    .navbutton {
+      border-radius: 5px;
+      border: none;
+      color: #000000;
+      padding: 10px 20px;
+      text-align: center;
+      text-decoration: none;
+      display: inline-block;
+      font-weight: bolder;
+      font-size: 16px;
+      margin: 4px 2px;
+      cursor: pointer;
+      background-color: #b388ff;
+      height: auto;
+      width: fit-content;
+    }
+    .navbtncontainer {
+      
+      display: flex;
+      align-items: left;
+      justify-content: space-between;
+      position: sticky;
+      bottom: 0;
+      background: #1f1f1f;
+      padding: 1rem 1.5rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      z-index: 1000;
+      box-shadow: 0 -2px 4px rgba(119, 0, 255, 0.288);
+    }
+    .sidebar .arrow {
+      transition: transform var(--transition-time) ease-in-out;
+      font-size: 0.8rem;
+      margin-left: 0.5rem;
+      pointer-events: none;
+      color: var(--fg);
+    }
+
+    .rightbar {
+      width: 240px;
+      right: 0;
+      background: #1e1e1e;
+      padding: 1rem;
+      overflow-y: auto;
+      border-left: 1px solid #333;
+      flex-shrink: 0;
+    }
+
+    .sidebar .arrow.expanded {
+      transform: rotate(90deg);
+    }
+
+    .sidebar .sub-container {
+      overflow: hidden;
+      max-height: 0;
+      transition: max-height var(--transition-time) ease-in-out;
+    }
+
+    .sidebar .sub-container.show {
+      max-height: 1000px;
+    }
+    
+    .sidebar .subitem a {
+      display: block;
+      padding: 0.4rem 0.8rem 0.4rem 1.5rem;
+      border-radius: 8px;
+      transition: background var(--transition-time), color var(--transition-time);
+    }
+
+    .sidebar .subitem a:hover {
+      background: var(--hover);
+      color: var(--highlight);
+    }
+
+    .content {
+      flex: 1;
+      padding: 2%;
+      padding-left: 10%;
+      
+      padding-right: 10%;
+      
+      overflow-y: auto;
+    }
+    .sidebar, .rightbar {
+      overflow-y: auto; /* Optional: Allow independent scrolling for sidebars */
+      height: 100%; /* Fill available height */
+    }
+    .demo-content h2 {
+      margin-top: 2rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 1px solid #333;
+    }
+    
+    .demo-content h3 {
+      margin-top: 1.5rem;
+    }
+    
+    .demo-content p {
+      line-height: 1.6;
+    }
+
+    /* Note styling */
+    .note {
+      background: rgba(26, 115, 232, 0.1);
+      border: 2px solid var(--note-color);
+      border-radius: 8px;
+      margin: 1.5rem 0;
+
+      transition: all var(--transition-time);
+    }
+
+    .note-header {
+      padding: 1rem;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: rgba(26, 115, 232, 0.2);
+    }
+
+    .note-header h2 {
+      margin: 0;
+      color: var(--note-color);
+    }
+
+    .note-arrow {
+      transition: transform 0.2s ease-in-out;
+    }
+
+    .note-arrow.expanded {
+      transform: rotate(90deg);
+    }
+
+    .note-content {
+    padding: 1rem;       
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height var(--transition-time) ease-in-out;
+    }
+
+    .note-content.show {
+      padding: 0.2rem;
+      display: block;
+      max-height: 1000px;
+      transition: max-height var(--transition-time) ease-in-out;
+    }
+
+
+
+    .info {
+    
+      background: #193C47;
+
+      border-radius: 8px;
+      border-left: 6px solid var(--note-color);
+      margin: 1.5rem 0;
+
+      transition: all var(--transition-time);
+    }
+
+    .info-header {
+      padding: 1rem;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      height: 2vh;
+
+    }
+    .info-content {
+        padding: 1rem;
+    }
+    table {
+  width: 100%;              /* Full width */
+  border-collapse: collapse; /* Remove double borders */
+  font-family: Arial, sans-serif;
+  text-align: center;       /* Center text inside cells */
+  margin: 20px 0;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+th, td {
+  padding: 12px 15px;
+  border: 1px solid #ddd;   /* Light border around cells */
+}
+
+th {
+
+  color: white;             /* White text for headers */
+  font-weight: 600;
+}
+
+tr:nth-child(even) {
+  background-color: #2b2b2b; /* Zebra striping on even rows */
+}
+
+tr:hover {
+  background-color: #b488ff31; /* Highlight row on hover */
+}
+@media (max-width: 768px) {
+  /* Stack layout vertically */
+  .layout {
+    flex-direction: column;
+    height: auto; /* Let height grow with content */
+  }
+  
+  /* Sidebar and rightbar become full width or hidden */
+  .sidebar, .rightbar {
+    width: 100%;
+    height: auto;
+    border: none;
+    border-right: none;
+    border-left: none;
+    padding: 0.5rem 1rem;
+    max-height: none; /* Remove max height limits */
+    overflow-y: visible;
+  }
+  
+  /* Hide rightbar on small screens, or you can toggle with JS */
+  .rightbar {
+    display: none;
+  }
+  
+  /* Content takes full width */
+  .content {
+    padding-left: 5%;
+    padding-right: 5%;
+    overflow-y: visible;
+  }
+  
+  /* Adjust header nav icons for smaller screens */
+  .sticky-header nav.nav-icons a {
+    font-size: 1.2rem;
+    margin-left: 10px;
+  }
+  
+  /* Make sidebar items bigger for easier tapping */
+  .sidebar .item {
+    font-size: 1.1rem;
+    padding: 1rem;
+  }
+  
+  /* Adjust nav buttons at bottom for better tap targets */
+  .navbtncontainer {
+    flex-direction: column;
+    gap: 0.5rem;
+    padding: 1rem;
+  }
+  
+  .navbutton {
+    width: 100%;
+    font-size: 1.2rem;
+  }
+}
+
+@media (max-width: 400px) {
+  /* Further reduce padding on very small screens */
+  .content {
+    padding-left: 2%;
+    padding-right: 2%;
+  }
+  
+  .sidebar .item {
+    font-size: 1rem;
+    padding: 0.7rem;
+  }
+  
+  /* Smaller header font size */
+  .sticky-header .logo {
+    font-size: 1.2rem;
+  }
+}
+/* Hide hamburger on desktop */
+#hamburger {
+  display: none;
+  background: none;
+  border: none;
+  font-size: 2rem;
+  color: var(--fg);
+  cursor: pointer;
+  padding: 0 1rem;
+}
+
+/* Responsive tweaks */
+@media (max-width: 768px) {
+  #hamburger {
+    display: block;
+  }
+
+  .layout {
+    flex-direction: column;
+    height: auto; /* Let layout grow */
+  }
+
+  .sidebar {
+    position: fixed;
+    top: 64px; /* height of header */
+    left: -15555;
+    width: 250px;
+    height: calc(100vh - 64px);
+    background: #1e1e1e00 !important;
+
+    transform: translateX(-260px);
+    transition: transform 0.3s ease;
+    z-index: 2000;
+
+  }
+
+
+  .sidebar.active {
+    transform: translateX(0);
+    background: #1E1E1E !important;
+    border-right: 1px solid #333;
+  }
+
+  .content {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+}
+
+  </style>
+</head>
+<body>
+
+  <header class="sticky-header">
+    <button id="hamburger" aria-label="Toggle menu" aria-expanded="false">&#9776;</button>
+    <div class="logo"> <a href="index.html">hb@home</a></div>
+    <nav class="nav-icons">
+      <a href="#">🏠</a>
+      <a href="#">👤</a>
+      <a href="#">⚙️</a>
+    </nav>
+  </header>
+  
+
+<div class="layout">
+  <div class="spacer" style="height: -50rem;"></div>
+  <aside class="sidebar" id="sidebar">
+    <!-- Sidebar content will be generated by JavaScript -->
+  </aside>
+  
+  
+  <main class="content" id="content">
+    <div class="demo-content">
+      <div id="section1" class="section">
+        <h2>How to pirate properly</h2>
+        <p>Written by: <b>zynthrodak</b></p>
+        <div><span style="background-color: burlywood; color:#000000; border-radius: 5px; padding: 5px;margin:15px;">30-60 minutes⏰</span>
+          <span style="background-color: rgb(222, 135, 222); color:#000000; border-radius: 5px; padding: 5px;margin:15px;">Beginner friendly😁</span>
+          <span style="background-color: rgb(138, 222, 135); color:#000000; border-radius: 5px; padding: 5px;margin:15px;">Featured guide⭐</span></div>
+        <p>Table of Contents</p>
+        <ul>
+          <li><a href="#prepare" style="font-size: larger;">Preparation</a></li>
+          <li><a href="#sites" style="font-size: larger;">Best sites</a></li>
+          <li><a href="#torrents" style="font-size: larger;">Understanding Torrents</a></li>
+          <li><a href="#finalizing" style="font-size: larger;">Finalizing</a></li>
+        </ul>
+        
+        <div class="info">
+          <div class="info-header">
+            <h2>Important Info</h2>
+
+          </div>
+          <div class="info-content">
+            <p>This guide is made for Windows users, i have no idea if it works on other platforms. Follow at your own risk.</p>
+          </div>
+        </div>
+
+        <div class="note">
+          <div class="note-header">
+            <h2>General Notes</h2>
+            <span class="note-arrow">▼</span>
+          </div>
+          <div class="note-content">
+            <ul>
+              <li>It's best to use a VPN to mask your torrenting from your ISP. I recommend NordVPN or ProtonVPN (SuperVPN on android). </li>
+              <li>You should use a torrent client that supports magnet links. The best one is qBittorrent, PLEASE DONT GET uTORRENT!!! </li>
+              <li>The download speeds all vary depending on the website and your internet speeds, but nothing should take more than an hour.</li>
+              <li><b>VERY IMPORTANT! You will need 2x the amount of storage of your app/game you want to pirate because you need space to unpack it.</b></li>
+
+            </ul>
+          </div>
+        </div>
+        <p> FILE HOST RANKING </p>
+        <table border="none">
+          <tr> 
+             <th></th>
+             <th>MegaDB</th>
+             <th>GoFile</th>
+             <th>1fichier</th>
+           </tr>
+           <tr>
+             <th>Speed</th>
+             <td>Fastest ~150mbps</td>
+             <td>Slower ~50mbps</td>
+             <td>Mid ~95mbps</td>
+           </tr>
+           <tr> 
+             <th>Popups?</th>
+             <td>Unlikely</td>
+             <td>None</td>
+             <td>Many</td>
+          </tr>
+          <tr> 
+             <th>Recommended?</th>
+             <td>Yes</td>
+             <td>Yes</td>
+             <td>No</td>
+          </tr>
+         </table>
+         <div class="prepare" style="height: 1rem;"></div>
+         <p> ROM/GAME SITES </p>
+        <table border="none">
+          <tr> 
+             <th></th>
+             <th>Roms</th>
+             <th>Steam Games</th>
+             <th>Apps</th>
+           </tr>
+           <tr>
+             <th>Best</th>
+             <td>r/Roms Megathread</td>
+             <td>SteamRip</td>
+             <td>fmhy.net</td>
+           </tr>
+           <tr> 
+             <th>Worse</th>
+             <td>emulatorgames.net</td>
+             <td>FitGirl Repacks</td>
+             <td>r/Piracy</td>
+          </tr>
+          <tr> 
+             <th>Absolute ass</th>
+             <td>consoleroms.com</td>
+             <td>SteamUnlocked (trojan)</td>
+             <td>PirateBay</td>
+          </tr>
+         </table>
+
+         <h2>With all of that, proceed to Preparation using the buttons below</h2>
+        
+        
+      </div>
+      <div id="preparation" class="section">
+        <h2>Preparation</h2>
+        <h3>1.1 Downloading all tools.</h3>
+        <p>What you will need:</p>
+        <ul style="font-size: large;">
+          <li>qBittorrent</li>
+          <li>7zip</li>
+          <li>Common sense</li>
+          <li>A tiny bit of computer knowledge</li>
+
+        </ul>
+        <h3>1.2 Installing and preparing everything</h3>
+        <p>First, get your 7zip installer from  <a href="https://www.7-zip.org/">https://www.7-zip.org/</a> and install it, after that's done, check if it's installed by pressing the Windows key and typing in "7z", if it pops up, it's installed correctly, if not, reinstall it. After getting 7z, download qBitTorrent, it's the best free and adFree torrent client, get it from <a href="https://www.qbittorrent.org/">https://www.qbittorrent.org/</a>, install it like 7z, but make sure to decline every ad in the installer. If you want to pirate Wii games, download WiiBackupManager, there isnt any reliable source for it so you just gotta look for it. After that's done proceed to step 1.3</p>
+        <h3>1.3 URLHASH</h3>
+        <p>If a site provides only zipped files and doesnt provide any torrent links, use URLHASH, its a tool that converts direct download links into MAGNET links. First, copy your download link by right clicking the download button and copying the address, go on URLHASH and paste in your link and press CONVERT, wait a bit then get your TORRENT file or MAGNET link, open it with qBitTorrent and wait for it to finalize. After thats done, great! You just learned how to use torrents and URLHASH. Proceed to 2.1.</p>
+        
+      </div>
+      <div id="torrents" class="section">
+        <h2>What is Torrenting?</h1>
+        <h3><strong>Torrenting</strong> is a method of sharing files over the internet using a peer-to-peer (P2P) network. Instead of downloading a file from a single server, torrenting lets you download pieces of that file from many different users (peers) simultaneously. This makes downloads often faster and more efficient.</p>
+
+        <h2>How it works:</h2>
+        <ul>
+            <li><strong>Torrent file / Magnet link:</strong> You start with a small file called a torrent or a magnet link. It doesn’t contain the actual data but information about the file and the network.</li>
+            <li><strong>Peers:</strong> Everyone sharing parts of the file is a peer. Peers upload and download pieces at the same time.</li>
+            <li><strong>Seeders:</strong> Peers who have the complete file and are sharing it are called seeders.</li>
+            <li><strong>Leechers:</strong> Peers who are still downloading parts are called leechers.</li>
+            <li><strong>Tracker:</strong> A server that helps peers find each other (sometimes optional with modern DHT and PEX methods).</li>
+        </ul>
+
+        <h2>Why it’s useful:</h2>
+        <ul>
+            <li><strong>Distributed load:</strong> No single server gets overloaded because many users share bandwidth.</li>
+            <li><strong>Fault tolerance:</strong> If some peers go offline, others can still provide the data.</li>
+            <li><strong>Speeds up sharing:</strong> The more seeders, the faster the download.</li>
+        </ul>
+        <div id="torrentnote" class="note">
+          <div class="note-header">
+            <h2>Torrenting note</h2>
+            <span class="note-arrow">▼</span>
+          </div>
+          <div class="note-content">
+            <p>Important note:</p>
+            <p>Torrenting itself is just a technology; it’s neutral. But it’s often associated with sharing copyrighted content illegally, which can get you into trouble. Many legal uses exist, like distributing open-source software, Linux ISOs, or public domain videos.</p>
+  
+          </div>
+        </div>
+
+      </div>
+    </div>
+    <div id="finalize" class="section">
+      <h2>Finalizing</h2>
+      <h3>4.1 Wii Roms</h3>
+      <p>If you want to convert your Wii roms from .RVZ to .WBFS, get dolphin nightly/developer, it has the latest features and a feature that allows you to convert files from .RVZ to .ISO, then you can use WBM to convert from .ISO to .WBFS for your usb loader.<br></br>
+        First, get your Wii roms from the r/Roms Megathread in RVZ format, add them to your dolphin install in the "Paths" option under "Configuration", wait for them to show up and right click them > convert > Convert to ISO > OK. After it finishes, open up WBM and drag your ISO over to it, select the box and press Convert > WBFS format and select your WBFS folder, you can also download all missing Covers and Disc Art. Once thats done, plug in your USB into your Wii and test, the preffered usb loader is "USB Loader GX".</p>
+      <h3>4.2 Fitgirl repacks</h3>
+      <p>Open your fitgirl repack and run the EXE, it should open up a window, press "Unpack" then select a destination folder. Wait for it to finish and you can play your pirated game now!</p>
+      <h3>4.3 Raw cracked game zips</h3>
+      <p>If you have a raw zip with the game files inside, use 7z, its the fastest tool for unzipping, windows is very slow. Right click your zip, select 7zip > unpack files > select a destination folder and press "ok". After it finishes just run the EXE file.</p>
+    </div>
+
+    <div id="finish" class="section">
+      <h2>Finished!</h2>
+      <p>Congrats! You just learned how to pirate games. Remember, piracy is illegal in most countries, but not in those that arent covered by the <strong>Digital Millennium Copyright Act (DMCA)</strong> 😉.</p>
+
+
+
+  </main> 
+  <div class="spacer" style="height: -50rem;"></div>
+  <aside class="rightbar" id="rightbar">
+    <ul style="font-size: large;">
+      <p>Translations</p>
+      <li><a href="#">English [EN-us]</a></li>
+      <li><a href="#">Polish [PL-pol]</a></li>
+      <li><a href="#">Albanian [AL-alb]</a></li>
+      <li><a href="#">Macedonian [MK-mkd]</a></li>
+    </ul>
+  </aside>
+  
+</div>
+<div class="navbtncontainer">
+  <button id="prev-button" class="navbutton">Previous</button>
+  <button id="next-button" class="navbutton">Next</button>
+</div>
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const content = document.getElementById('content');
+    const sidebar = document.getElementById('sidebar');
+    const sectionContainers = content.querySelectorAll('.section');
+  
+    // Generate sidebar and assign IDs
+    sectionContainers.forEach((section, index) => {
+      const heading = section.querySelector('h2, h3');
+      if (!heading) return;
+  
+      const id = heading.textContent.toLowerCase().replace(/\s+/g, '-').replace(/[^\w-]/g, '');
+      heading.id = id;
+      section.id = id;
+  
+      const listItem = document.createElement('div');
+      listItem.innerHTML = `<a class="item" href="#${id}">${heading.textContent}</a>`;
+      sidebar.appendChild(listItem);
+    });
+  
+    const sidebarItems = sidebar.querySelectorAll('.item');
+  
+    let currentSectionIndex = 0;
+  
+    function showSection(index) {
+      // Hide all sections
+      sectionContainers.forEach((section, i) => {
+        section.style.display = i === index ? 'block' : 'none';
+      });
+  
+      // Update sidebar highlight
+      sidebarItems.forEach(i => i.classList.remove('active'));
+      if (sidebarItems[index]) sidebarItems[index].classList.add('active');
+  
+      // Update button texts
+      const total = sectionContainers.length;
+      const prevIndex = (index - 1 + total) % total;
+      const nextIndex = (index + 1) % total;
+  
+      const prevHeading = sectionContainers[prevIndex].querySelector('h2, h3').textContent;
+      const nextHeading = sectionContainers[nextIndex].querySelector('h2, h3').textContent;
+  
+      document.getElementById('prev-button').textContent = `Back: ${prevHeading}`;
+      document.getElementById('next-button').textContent = `Next: ${nextHeading}`;
+    }
+  
+    // Initially show the first section
+    showSection(currentSectionIndex);
+  
+    // Sidebar navigation
+    sidebarItems.forEach((item, index) => {
+      item.addEventListener('click', function (e) {
+        e.preventDefault();
+        currentSectionIndex = index;
+        showSection(currentSectionIndex);
+      });
+    });
+  
+    // Prev button
+    document.getElementById('prev-button').addEventListener('click', () => {
+      currentSectionIndex = (currentSectionIndex - 1 + sectionContainers.length) % sectionContainers.length;
+      showSection(currentSectionIndex);
+    });
+  
+    // Next button
+    document.getElementById('next-button').addEventListener('click', () => {
+      currentSectionIndex = (currentSectionIndex + 1) % sectionContainers.length;
+      showSection(currentSectionIndex);
+    });
+    document.querySelectorAll('.note').forEach(note => {
+  const header = note.querySelector('.note-header');
+  const content = note.querySelector('.note-content');
+  const arrow = note.querySelector('.note-arrow');
+
+  // Ensure collapsed on page load:
+  content.classList.remove('show');
+  arrow.classList.remove('expanded');
+
+  header.addEventListener('click', () => {
+    const isExpanded = content.classList.contains('show');
+    if (isExpanded) {
+      content.classList.remove('show');
+      arrow.classList.remove('expanded');
+    } else {
+      content.classList.add('show');
+      arrow.classList.add('expanded');
+    }
+  });
+});
+const hamburger = document.getElementById('hamburger');
+  const sidebarr = document.getElementById('sidebar');
+
+  hamburger.addEventListener('click', () => {
+    sidebarr.classList.toggle('active');
+    const expanded = hamburger.getAttribute('aria-expanded') === 'true';
+    hamburger.setAttribute('aria-expanded', !expanded);
+    sidebar.style.backgroundColor = expanded ? '#1e1e1e' : '#1e1e1e';
+  });
+
+
+  });
+  </script>
+  
+
+
+
+</body>
+</html>
